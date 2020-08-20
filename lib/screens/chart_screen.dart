@@ -49,36 +49,37 @@ class _HashtagChartState extends State<HashtagChart> {
   Widget createChartsView(BuildContext context, AsyncSnapshot snapshot) {
     List<WordData> wordDataList = snapshot.data['wordDataList'];
     List<HashtagData> hashtagDataList = snapshot.data['hashtagDataList'];
-    return new Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Padding(
-              padding: EdgeInsets.all(32.0),
-              child: SizedBox(
-                height: 200.0,
-                child: new charts.BarChart(
-                  wordSeriesList(wordDataList),
-                  barRendererDecorator: new charts.BarLabelDecorator<String>(),
-                  domainAxis: new charts.OrdinalAxisSpec(),
+    return ListView(
+      children: <Widget>[
+        Container(
+          height: 200.0,
+          child: new charts.PieChart(
+            wordSeriesList(wordDataList),
+            defaultRenderer: new charts.ArcRendererConfig(
+              arcRendererDecorators: [
+                new charts.ArcLabelDecorator(
+                  labelPosition: charts.ArcLabelPosition.outside
                 )
-              ),
+              ]
             ),
-            new Padding(
-              padding: EdgeInsets.all(32.0),
-              child: SizedBox(
-                height: 200.0,
-                child: new charts.BarChart(
-                  hashtagSeriesList(hashtagDataList),
-                  animate: false,
-                  barRendererDecorator: new charts.BarLabelDecorator<String>(),
-                  domainAxis: new charts.OrdinalAxisSpec(),
-                ),
-              ),
-            ),
-          ],
+          )
         ),
-      );
+        Divider(height: 30.0),
+        Container(
+          height: 200.0,
+          child: new charts.PieChart(
+            hashtagSeriesList(hashtagDataList),
+            defaultRenderer: new charts.ArcRendererConfig(
+              arcRendererDecorators: [
+                new charts.ArcLabelDecorator(
+                  labelPosition: charts.ArcLabelPosition.outside
+                )
+              ]
+            ),            
+          ),
+        ),
+      ],
+    );
   }
 
   List<charts.Series<WordData, String>> wordSeriesList(List<WordData> data){
@@ -88,6 +89,7 @@ class _HashtagChartState extends State<HashtagChart> {
         data: data,
         domainFn: (WordData wordData, _) => wordData.word,
         measureFn: (WordData wordData, _) => wordData.count,
+        labelAccessorFn: (WordData row, _) => '${row.word}: ${row.count}'
       ),
     ];
   }
@@ -99,6 +101,7 @@ class _HashtagChartState extends State<HashtagChart> {
         data: data,
         domainFn: (HashtagData hashtagData, _) => hashtagData.hashtag,
         measureFn: (HashtagData hashtagData, _) => hashtagData.count,
+        labelAccessorFn: (HashtagData row, _) => '${row.hashtag} : ${row.count}',
       ),
     ];
   }
